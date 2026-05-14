@@ -38,12 +38,10 @@
 
   #root { min-height: 100vh; }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
-  /* Selection */
   ::selection { background: var(--accent); color: var(--bg); }
 </style>
 
@@ -66,7 +64,6 @@
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 
-/* ── Utility ──────────────────────────────────────────── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -95,10 +92,8 @@ function Reveal({ children, delay = 0, style = {} }) {
   );
 }
 
-/* ── Nav ──────────────────────────────────────────────── */
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', h);
@@ -123,7 +118,6 @@ function Nav() {
       borderBottom: scrolled ? '1px solid rgba(240,236,224,0.06)' : '1px solid transparent',
       transition: 'all 0.4s ease',
     }}>
-      {/* Logo */}
       <a href="#hero" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{
           width: 28, height: 28, background: 'var(--accent)', borderRadius: 4,
@@ -136,7 +130,6 @@ function Nav() {
         </span>
       </a>
 
-      {/* Desktop links */}
       <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
         {links.map(l => (
           <a key={l.href} href={l.href} style={{
@@ -148,20 +141,25 @@ function Nav() {
           onMouseLeave={e => e.target.style.color = 'var(--muted)'}
           >{l.label}</a>
         ))}
-        <a href="#contact" style={{
-          textDecoration: 'none', background: 'var(--accent)', color: 'var(--bg)',
-          padding: '8px 20px', borderRadius: 4, fontSize: 13, fontWeight: 600,
-          letterSpacing: '0.04em', transition: 'background 0.2s',
-        }}
-        onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
-        onMouseLeave={e => e.target.style.background = 'var(--accent)'}
-        >Написать нам</a>
+        <a 
+          href="https://b24-hy0so2.bitrix24.site/crm_form_tt1bn/" 
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            textDecoration: 'none', background: 'var(--accent)', color: 'var(--bg)',
+            padding: '8px 20px', borderRadius: 4, fontSize: 13, fontWeight: 600,
+            letterSpacing: '0.04em', transition: 'background 0.2s',
+          }}
+          onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
+          onMouseLeave={e => e.target.style.background = 'var(--accent)'}
+        >
+          Написать нам
+        </a>
       </div>
     </nav>
   );
 }
 
-/* ── Hero ──────────────────────────────────────────────── */
 function Hero() {
   return (
     <section id="hero" style={{
@@ -170,7 +168,6 @@ function Hero() {
       padding: '0 40px 80px',
       position: 'relative', overflow: 'hidden',
     }}>
-      {/* Background grid texture */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: `
@@ -179,7 +176,6 @@ function Hero() {
         `,
         backgroundSize: '80px 80px',
       }} />
-      {/* Accent glow */}
       <div style={{
         position: 'absolute', top: '20%', right: '10%',
         width: 400, height: 400, borderRadius: '50%',
@@ -187,7 +183,6 @@ function Hero() {
         pointerEvents: 'none',
       }} />
 
-      {/* Tag */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Reveal>
           <span style={{
@@ -205,7 +200,7 @@ function Hero() {
             maxWidth: 900, marginBottom: 32,
           }}>
             Не обучаем —<br />
-            <em style={{ color: 'var(--accent)', fontStyle: 'italic' }}>передаём</em> культуру
+            <em style={{ color: 'var(--accent)', fontStyle: 'italic' }}>передаем</em> культуру
           </h1>
         </Reveal>
 
@@ -241,7 +236,6 @@ function Hero() {
         </Reveal>
       </div>
 
-      {/* Scroll indicator */}
       <div style={{
         position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
@@ -256,14 +250,13 @@ function Hero() {
   );
 }
 
-/* ── Approach / ADKAR ──────────────────────────────────── */
 function Approach() {
   const [active, setActive] = useState(0);
 
   const steps = [
     {
       key: 'A', label: 'Осознание', en: 'Awareness',
-      text: 'Участники видят реальную картину — не слайды, а работающую систему. Мы создаём среду, в которой невозможно не заметить разрыв между «как есть» и «как может быть».',
+      text: 'Участники видят реальную картину — не слайды, а работающую систему. Мы создаем среду, в которой невозможно не заметить разрыв между «как есть» и «как может быть».',
       accent: true,
     },
     {
@@ -317,7 +310,6 @@ function Approach() {
 
         <Reveal delay={0.15}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 0 }}>
-            {/* Steps list */}
             <div style={{ borderRight: '1px solid var(--border)' }}>
               {steps.map((s, i) => (
                 <button key={s.key} onClick={() => setActive(i)} style={{
@@ -354,7 +346,6 @@ function Approach() {
               ))}
             </div>
 
-            {/* Detail pane */}
             <div style={{
               padding: '40px 48px',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -379,8 +370,9 @@ function Approach() {
   );
 }
 
-/* ── Programs ──────────────────────────────────────────── */
 function Programs() {
+  const crmLink = 'https://b24-hy0so2.bitrix24.site/crm_form_tt1bn/';
+
   const programs = [
     {
       tag: 'Интенсив · 2 дня',
@@ -395,7 +387,7 @@ function Programs() {
       title: 'Искусственный интеллект для руководителей',
       desc: 'Практический взгляд на ИИ от команды, которая внедряет его в реальное производство без программистов и консультантов.',
       topics: ['Инструменты ИИ в работе', 'Автоматизация без IT-команды', 'Кейсы из практики', 'Разбор своих задач'],
-      href: '#contact',
+      href: crmLink,
       featured: false,
     },
     {
@@ -403,7 +395,7 @@ function Programs() {
       title: 'Программа под вашу задачу',
       desc: 'Если ваш запрос шире стандартного формата — мы проектируем программу под конкретный контекст, команду и цели.',
       topics: ['Исследование вашего запроса', 'Кастомный формат', 'Ваши кейсы в центре', 'Любая длительность'],
-      href: '#contact',
+      href: crmLink,
       featured: false,
     },
   ];
@@ -473,7 +465,7 @@ function ProgramCard({ program: p }) {
           </div>
         ))}
       </div>
-      <a href={p.href} target={p.href.startsWith('http') ? '_blank' : '_self'} style={{
+      <a href={p.href} target={p.href.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer" style={{
         textDecoration: 'none',
         display: 'inline-flex', alignItems: 'center', gap: 8,
         fontSize: 13, fontWeight: 600, letterSpacing: '0.04em',
@@ -482,13 +474,12 @@ function ProgramCard({ program: p }) {
         paddingTop: 8, borderTop: '1px solid var(--border)',
         marginTop: 4,
       }}>
-        {p.href === '#contact' ? 'Обсудить формат' : 'Подробнее о программе'} →
+        {p.featured ? 'Подробнее о программе' : 'Обсудить формат'} →
       </a>
     </div>
   );
 }
 
-/* ── About ─────────────────────────────────────────────── */
 function About() {
   const stats = [
     { n: '30', unit: 'лет', label: 'на рынке упаковки' },
@@ -532,7 +523,6 @@ function About() {
               </p>
             </Reveal>
 
-            {/* Quote */}
             <Reveal delay={0.15}>
               <blockquote style={{
                 borderLeft: '2px solid var(--accent)',
@@ -574,11 +564,11 @@ function About() {
             <Reveal delay={0.2}>
               <div style={{ padding: '28px 32px', background: 'var(--bg3)', borderRadius: 4 }}>
                 <p style={{ fontSize: 12, letterSpacing: '0.08em', color: 'var(--muted)', fontWeight: 600, marginBottom: 16 }}>
-                  ПОЧЕМУ МЫ СОЗДАЁМ ПРОГРАММЫ
+                  ПОЧЕМУ МЫ СОЗДАЕМ ПРОГРАММЫ
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
-                    'Всё, что показываем — реально внедрено и работает каждый день',
+                    'Все, что показываем — реально внедрено и работает каждый день',
                     'Нет теорий без практики: каждый инструмент в контексте',
                     'Участники видят результат, а не процесс обучения',
                   ].map((item, i) => (
@@ -602,15 +592,8 @@ function About() {
   );
 }
 
-/* ── Contact ───────────────────────────────────────────── */
 function Contact() {
-  const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({ name: '', company: '', message: '' });
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    setSent(true);
-  }
+  const crmLink = 'https://b24-hy0so2.bitrix24.site/crm_form_tt1bn/';
 
   return (
     <section id="contact" style={{
@@ -637,7 +620,7 @@ function Contact() {
             </Reveal>
             <Reveal delay={0.1}>
               <p style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 48 }}>
-                Расскажите о вашей ситуации — мы разберёмся, есть ли смысл в совместной работе и в каком формате.
+                Расскажите о вашей ситуации — мы разберемся, есть ли смысл в совместной работе и в каком формате.
               </p>
             </Reveal>
 
@@ -668,52 +651,48 @@ function Contact() {
           </div>
 
           <Reveal delay={0.1}>
-            {!sent ? (
-              <form onSubmit={handleSubmit} style={{
-                display: 'flex', flexDirection: 'column', gap: 16,
-                padding: '40px', background: 'var(--bg2)',
-                border: '1px solid var(--border)', borderRadius: 4,
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: 20,
+              padding: '40px', background: 'var(--bg2)',
+              border: '1px solid var(--border)', borderRadius: 4,
+            }}>
+              <h3 style={{
+                fontFamily: 'var(--serif)',
+                fontSize: 28,
+                fontWeight: 400,
+                lineHeight: 1.2,
+                color: 'var(--text)',
               }}>
-                <FormField
-                  label="Имя и компания"
-                  placeholder="Иван Иванов, ООО Производство"
-                  value={form.name}
-                  onChange={v => setForm({ ...form, name: v })}
-                />
-                <FormField
-                  label="Ваш запрос"
-                  placeholder="Расскажите о задаче..."
-                  value={form.message}
-                  onChange={v => setForm({ ...form, message: v })}
-                  multiline
-                />
-                <button type="submit" style={{
-                  background: 'var(--accent)', color: 'var(--bg)',
-                  border: 'none', cursor: 'pointer',
-                  padding: '14px 24px', borderRadius: 4,
-                  fontSize: 14, fontWeight: 600, letterSpacing: '0.04em',
-                  transition: 'background 0.2s', fontFamily: 'var(--sans)',
+                Оставить заявку
+              </h3>
+              <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7 }}>
+                Перейдите в форму Bitrix24, заполните контактные данные и кратко опишите ваш запрос.
+              </p>
+              <a
+                href={crmLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  textDecoration: 'none',
+                  textAlign: 'center',
+                  background: 'var(--accent)',
+                  color: 'var(--bg)',
+                  padding: '14px 24px',
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                  transition: 'background 0.2s',
                 }}
                 onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
                 onMouseLeave={e => e.target.style.background = 'var(--accent)'}
-                >Отправить</button>
-                <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
-                  Или напишите напрямую в Telegram — @AnnVFed
-                </p>
-              </form>
-            ) : (
-              <div style={{
-                padding: '40px', background: 'var(--bg2)',
-                border: '1px solid rgba(255,201,64,0.25)', borderRadius: 4,
-                textAlign: 'center',
-              }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
-                <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 400, marginBottom: 12 }}>Получили!</h3>
-                <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7 }}>
-                  Анастасия свяжется с вами в ближайшее время.
-                </p>
-              </div>
-            )}
+              >
+                Заполнить форму
+              </a>
+              <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
+                Или напишите напрямую в Telegram — @AnnVFed
+              </p>
+            </div>
           </Reveal>
         </div>
       </div>
@@ -737,35 +716,6 @@ function ContactItem({ label, value, href }) {
   );
 }
 
-function FormField({ label, placeholder, value, onChange, multiline }) {
-  const inputStyle = {
-    width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
-    borderRadius: 4, color: 'var(--text)', fontFamily: 'var(--sans)',
-    fontSize: 14, padding: '12px 14px', outline: 'none',
-    transition: 'border-color 0.2s', resize: 'vertical',
-  };
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <label style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.06em' }}>
-        {label.toUpperCase()}
-      </label>
-      {multiline
-        ? <textarea rows={4} placeholder={placeholder} value={value}
-            onChange={e => onChange(e.target.value)} style={inputStyle}
-            onFocus={e => e.target.style.borderColor = 'rgba(255,201,64,0.5)'}
-            onBlur={e => e.target.style.borderColor = 'var(--border)'}
-          />
-        : <input type="text" placeholder={placeholder} value={value}
-            onChange={e => onChange(e.target.value)} style={{ ...inputStyle, resize: 'none' }}
-            onFocus={e => e.target.style.borderColor = 'rgba(255,201,64,0.5)'}
-            onBlur={e => e.target.style.borderColor = 'var(--border)'}
-          />
-      }
-    </div>
-  );
-}
-
-/* ── Footer ─────────────────────────────────────────────── */
 function Footer() {
   return (
     <footer style={{
@@ -787,7 +737,6 @@ function Footer() {
   );
 }
 
-/* ── App ─────────────────────────────────────────────────── */
 function App() {
   return (
     <>
