@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практики Рэмос — образовательные программы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #111009;
+    --bg2: #181610;
+    --bg3: #1f1d14;
+    --text: #f0ece0;
+    --muted: #8a8470;
+    --accent: #ffc940;
+    --accent2: #e8b82e;
+    --border: rgba(240,236,224,0.08);
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Manrope', Helvetica, Arial, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root { min-height: 100vh; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* Selection */
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+
+<template id="__bundler_thumbnail" data-bg-color="#111009">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#111009"/>
+    <rect x="10" y="10" width="14" height="14" rx="2" fill="#ffc940"/>
+    <text x="28" y="21" font-size="8" fill="#f0ece0" font-family="serif" font-weight="400">ПРАКТИКИ РЭМОС</text>
+    <rect x="10" y="32" width="60" height="3" rx="1" fill="#f0ece0" opacity="0.8"/>
+    <rect x="10" y="40" width="45" height="2" rx="1" fill="#8a8470"/>
+    <rect x="10" y="54" width="28" height="14" rx="2" fill="#1f1d14"/>
+    <rect x="42" y="54" width="28" height="14" rx="2" fill="#1f1d14"/>
+    <rect x="74" y="54" width="28" height="14" rx="2" fill="#1f1d14"/>
+    <rect x="10" y="54" width="28" height="2" rx="0" fill="#ffc940"/>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ── Utility ──────────────────────────────────────────── */
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
+function Reveal({ children, delay = 0, style = {} }) {
+  const [ref, visible] = useInView();
+  return (
+    <div ref={ref} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(28px)',
+      transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+      ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+/* ── Nav ──────────────────────────────────────────────── */
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', h);
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+
+  const links = [
+    { label: 'Подход', href: '#approach' },
+    { label: 'Программы', href: '#programs' },
+    { label: 'О нас', href: '#about' },
+    { label: 'Контакт', href: '#contact' },
+  ];
+
+  return (
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+      padding: '0 40px',
+      height: 64,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      background: scrolled ? 'rgba(17,16,9,0.92)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(16px)' : 'none',
+      borderBottom: scrolled ? '1px solid rgba(240,236,224,0.06)' : '1px solid transparent',
+      transition: 'all 0.4s ease',
+    }}>
+      {/* Logo */}
+      <a href="#hero" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{
+          width: 28, height: 28, background: 'var(--accent)', borderRadius: 4,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 14, color: 'var(--bg)',
+          flexShrink: 0,
+        }}>Р</span>
+        <span style={{ fontFamily: 'var(--sans)', fontWeight: 500, fontSize: 14, color: 'var(--text)', letterSpacing: '0.05em' }}>
+          ПРАКТИКИ РЭМОС
+        </span>
+      </a>
+
+      {/* Desktop links */}
+      <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
+        {links.map(l => (
+          <a key={l.href} href={l.href} style={{
+            textDecoration: 'none', color: 'var(--muted)', fontSize: 13,
+            fontWeight: 500, letterSpacing: '0.04em',
+            transition: 'color 0.2s',
+          }}
+          onMouseEnter={e => e.target.style.color = 'var(--text)'}
+          onMouseLeave={e => e.target.style.color = 'var(--muted)'}
+          >{l.label}</a>
+        ))}
+        <a href="#contact" style={{
+          textDecoration: 'none', background: 'var(--accent)', color: 'var(--bg)',
+          padding: '8px 20px', borderRadius: 4, fontSize: 13, fontWeight: 600,
+          letterSpacing: '0.04em', transition: 'background 0.2s',
+        }}
+        onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
+        onMouseLeave={e => e.target.style.background = 'var(--accent)'}
+        >Написать нам</a>
+      </div>
+    </nav>
+  );
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+function Hero() {
+  return (
+    <section id="hero" style={{
+      minHeight: '100vh',
+      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+      padding: '0 40px 80px',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      {/* Background grid texture */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `
+          linear-gradient(rgba(240,236,224,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(240,236,224,0.025) 1px, transparent 1px)
+        `,
+        backgroundSize: '80px 80px',
+      }} />
+      {/* Accent glow */}
+      <div style={{
+        position: 'absolute', top: '20%', right: '10%',
+        width: 400, height: 400, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,201,64,0.08) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Tag */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Reveal>
+          <span style={{
+            display: 'inline-block', border: '1px solid rgba(255,201,64,0.35)',
+            color: 'var(--accent)', fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.12em', padding: '5px 12px', borderRadius: 2, marginBottom: 32,
+          }}>ОБРАЗОВАТЕЛЬНЫЕ ПРОГРАММЫ</span>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <h1 style={{
+            fontFamily: 'var(--serif)', fontWeight: 400,
+            fontSize: 'clamp(44px, 7vw, 96px)',
+            lineHeight: 1.05, letterSpacing: '-0.01em',
+            maxWidth: 900, marginBottom: 32,
+          }}>
+            Не обучаем —<br />
+            <em style={{ color: 'var(--accent)', fontStyle: 'italic' }}>передаём</em> культуру
+          </h1>
+        </Reveal>
+
+        <Reveal delay={0.2}>
+          <p style={{
+            fontSize: 18, color: 'var(--muted)', maxWidth: 560,
+            lineHeight: 1.7, marginBottom: 52, fontWeight: 300,
+          }}>
+            Мы открываем доступ к производственной культуре, которую строили сами. Через диалог и практику — без конспектов ради конспектов.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.3}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            <a href="#programs" style={{
+              textDecoration: 'none', background: 'var(--accent)', color: 'var(--bg)',
+              padding: '14px 32px', borderRadius: 4, fontSize: 14, fontWeight: 600,
+              letterSpacing: '0.04em', transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
+            onMouseLeave={e => e.target.style.background = 'var(--accent)'}
+            >Смотреть программы</a>
+            <a href="#about" style={{
+              textDecoration: 'none', color: 'var(--muted)', fontSize: 14,
+              fontWeight: 500, letterSpacing: '0.04em',
+              borderBottom: '1px solid var(--border)',
+              paddingBottom: 2, transition: 'color 0.2s, border-color 0.2s',
+            }}
+            onMouseEnter={e => { e.target.style.color = 'var(--text)'; e.target.style.borderColor = 'var(--muted)'; }}
+            onMouseLeave={e => { e.target.style.color = 'var(--muted)'; e.target.style.borderColor = 'var(--border)'; }}
+            >О нас →</a>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Scroll indicator */}
+      <div style={{
+        position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+        color: 'var(--muted)', fontSize: 11, letterSpacing: '0.1em',
+      }}>
+        <span style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>SCROLL</span>
+        <div style={{
+          width: 1, height: 40, background: 'linear-gradient(to bottom, var(--muted), transparent)',
+        }} />
+      </div>
+    </section>
+  );
+}
+
+/* ── Approach / ADKAR ──────────────────────────────────── */
+function Approach() {
+  const [active, setActive] = useState(0);
+
+  const steps = [
+    {
+      key: 'A', label: 'Осознание', en: 'Awareness',
+      text: 'Участники видят реальную картину — не слайды, а работающую систему. Мы создаём среду, в которой невозможно не заметить разрыв между «как есть» и «как может быть».',
+      accent: true,
+    },
+    {
+      key: 'D', label: 'Желание', en: 'Desire',
+      text: 'Через личное взаимодействие с практиками и погружение в производственный контекст рождается собственная мотивация к изменениям — не навязанная, а внутренняя.',
+      accent: true,
+    },
+    {
+      key: 'K', label: 'Знание', en: 'Knowledge',
+      text: 'Инструменты Lean, процессного управления и ИИ — в контексте реальных задач. Знание, которое сразу ложится в практику.',
+      accent: false,
+    },
+    {
+      key: 'A2', label: 'Способность', en: 'Ability',
+      text: 'Каждый участник уходит с готовым планом внедрения под свою компанию. Мы работаем со своими кейсами, а не с модельными задачами.',
+      accent: false,
+    },
+    {
+      key: 'R', label: 'Закрепление', en: 'Reinforcement',
+      text: 'Поддержка продолжается после программы: чат, консультации, разбор внедрений. Мы заинтересованы в результате не меньше участников.',
+      accent: false,
+    },
+  ];
+
+  return (
+    <section id="approach" style={{
+      padding: '120px 40px',
+      background: 'var(--bg2)',
+      borderTop: '1px solid var(--border)',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <Reveal>
+          <p style={{ fontSize: 11, letterSpacing: '0.12em', color: 'var(--accent)', fontWeight: 600, marginBottom: 16 }}>
+            НАШ ПОДХОД
+          </p>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 style={{
+            fontFamily: 'var(--serif)', fontWeight: 400,
+            fontSize: 'clamp(32px, 4vw, 56px)', lineHeight: 1.1,
+            marginBottom: 16, maxWidth: 600,
+          }}>
+            Мы работаем со слоями A и D модели ADKAR
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p style={{ color: 'var(--muted)', maxWidth: 520, marginBottom: 64, lineHeight: 1.7 }}>
+            Большинство программ дают знания. Мы начинаем с другого — с осознания и желания. Потому что без них ни один инструмент не работает.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 0 }}>
+            {/* Steps list */}
+            <div style={{ borderRight: '1px solid var(--border)' }}>
+              {steps.map((s, i) => (
+                <button key={s.key} onClick={() => setActive(i)} style={{
+                  display: 'flex', alignItems: 'center', gap: 16,
+                  width: '100%', padding: '24px 32px 24px 0',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  borderBottom: i < steps.length - 1 ? '1px solid var(--border)' : 'none',
+                  textAlign: 'left', transition: 'all 0.2s',
+                }}>
+                  <span style={{
+                    width: 40, height: 40, borderRadius: 4,
+                    background: active === i ? 'var(--accent)' : (s.accent ? 'rgba(255,201,64,0.12)' : 'rgba(240,236,224,0.05)'),
+                    color: active === i ? 'var(--bg)' : (s.accent ? 'var(--accent)' : 'var(--muted)'),
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 18,
+                    flexShrink: 0, transition: 'all 0.3s',
+                  }}>
+                    {s.key.replace('2', '')}
+                  </span>
+                  <div>
+                    <div style={{
+                      fontSize: 14, fontWeight: 600,
+                      color: active === i ? 'var(--text)' : (s.accent ? 'var(--text)' : 'var(--muted)'),
+                      transition: 'color 0.2s',
+                    }}>{s.label}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.06em' }}>{s.en}</div>
+                  </div>
+                  {s.accent && <span style={{
+                    marginLeft: 'auto', fontSize: 10, letterSpacing: '0.08em',
+                    color: 'var(--accent)', fontWeight: 600, border: '1px solid rgba(255,201,64,0.3)',
+                    padding: '2px 8px', borderRadius: 2,
+                  }}>ФОКУС</span>}
+                </button>
+              ))}
+            </div>
+
+            {/* Detail pane */}
+            <div style={{
+              padding: '40px 48px',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            }}>
+              <div style={{ fontSize: 72, fontFamily: 'var(--serif)', color: 'rgba(255,201,64,0.12)', lineHeight: 1, marginBottom: 24, fontWeight: 400 }}>
+                {steps[active].key.replace('2', '')}
+              </div>
+              <h3 style={{
+                fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 32,
+                marginBottom: 20, color: 'var(--text)',
+              }}>
+                {steps[active].label}
+              </h3>
+              <p style={{ color: 'var(--muted)', fontSize: 16, lineHeight: 1.8 }}>
+                {steps[active].text}
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ── Programs ──────────────────────────────────────────── */
+function Programs() {
+  const programs = [
+    {
+      tag: 'Интенсив · 2 дня',
+      title: 'Управление изменениями в производстве',
+      desc: 'Погружение в систему, которая реально работает. Lean, процессное управление и ИИ — через практику на действующем предприятии.',
+      topics: ['Модель изменений ADKAR', 'Целеполагание и каскадирование', 'Lean-инструменты', 'ИИ в управлении'],
+      href: 'https://praktikiremos.tilda.ws/',
+      featured: true,
+    },
+    {
+      tag: 'Интенсив 1 день',
+      title: 'Искусственный интеллект для руководителей',
+      desc: 'Практический взгляд на ИИ от команды, которая внедряет его в реальное производство без программистов и консультантов.',
+      topics: ['Инструменты ИИ в работе', 'Автоматизация без IT-команды', 'Кейсы из практики', 'Разбор своих задач'],
+      href: '#contact',
+      featured: false,
+    },
+    {
+      tag: 'Под запрос',
+      title: 'Программа под вашу задачу',
+      desc: 'Если ваш запрос шире стандартного формата — мы проектируем программу под конкретный контекст, команду и цели.',
+      topics: ['Исследование вашего запроса', 'Кастомный формат', 'Ваши кейсы в центре', 'Любая длительность'],
+      href: '#contact',
+      featured: false,
+    },
+  ];
+
+  return (
+    <section id="programs" style={{
+      padding: '120px 40px',
+      borderTop: '1px solid var(--border)',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <Reveal>
+          <p style={{ fontSize: 11, letterSpacing: '0.12em', color: 'var(--accent)', fontWeight: 600, marginBottom: 16 }}>
+            ПРОГРАММЫ
+          </p>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 style={{
+            fontFamily: 'var(--serif)', fontWeight: 400,
+            fontSize: 'clamp(32px, 4vw, 56px)', lineHeight: 1.1,
+            marginBottom: 64,
+          }}>
+            Что мы предлагаем
+          </h2>
+        </Reveal>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: 'var(--border)' }}>
+          {programs.map((p, i) => (
+            <Reveal key={i} delay={i * 0.08}>
+              <ProgramCard program={p} />
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProgramCard({ program: p }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: '48px 36px',
+        background: hovered ? 'var(--bg3)' : 'var(--bg)',
+        display: 'flex', flexDirection: 'column', gap: 20,
+        transition: 'background 0.3s',
+        height: '100%',
+        borderTop: p.featured ? `2px solid var(--accent)` : '2px solid transparent',
+      }}>
+      <div>
+        <span style={{
+          fontSize: 11, letterSpacing: '0.1em', fontWeight: 600,
+          color: p.featured ? 'var(--accent)' : 'var(--muted)',
+        }}>{p.tag}</span>
+      </div>
+      <h3 style={{
+        fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 22, lineHeight: 1.3, color: 'var(--text)',
+      }}>{p.title}</h3>
+      <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7, flex: 1 }}>{p.desc}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {p.topics.map((t, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
+            <span style={{ fontSize: 13, color: 'var(--muted)' }}>{t}</span>
+          </div>
+        ))}
+      </div>
+      <a href={p.href} target={p.href.startsWith('http') ? '_blank' : '_self'} style={{
+        textDecoration: 'none',
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        fontSize: 13, fontWeight: 600, letterSpacing: '0.04em',
+        color: hovered ? 'var(--accent)' : 'var(--muted)',
+        transition: 'color 0.2s',
+        paddingTop: 8, borderTop: '1px solid var(--border)',
+        marginTop: 4,
+      }}>
+        {p.href === '#contact' ? 'Обсудить формат' : 'Подробнее о программе'} →
+      </a>
+    </div>
+  );
+}
+
+/* ── About ─────────────────────────────────────────────── */
+function About() {
+  const stats = [
+    { n: '30', unit: 'лет', label: 'на рынке упаковки' },
+    { n: 'ТОП 3', unit: '', label: 'производитель в СЗФО' },
+    { n: '100 +', unit: '\n', label: 'участников прошли обучение' },
+    { n: '2', unit: 'программы', label: 'запущено и проведено' },
+  ];
+
+  return (
+    <section id="about" style={{
+      padding: '120px 40px',
+      background: 'var(--bg2)',
+      borderTop: '1px solid var(--border)',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+
+          <div>
+            <Reveal>
+              <p style={{ fontSize: 11, letterSpacing: '0.12em', color: 'var(--accent)', fontWeight: 600, marginBottom: 16 }}>
+                О НАС
+              </p>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <h2 style={{
+                fontFamily: 'var(--serif)', fontWeight: 400,
+                fontSize: 'clamp(28px, 3.5vw, 48px)', lineHeight: 1.15,
+                marginBottom: 28,
+              }}>
+                Живая фабрика изменений
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 24 }}>
+                <strong style={{ color: 'var(--text)', fontWeight: 500 }}>Рэмос-Альфа</strong> — производственное предприятие, которое внедряет Lean, ИИ и проектное управление своими силами, без консультантов и IT-команд.
+              </p>
+            </Reveal>
+            <Reveal delay={0.12}>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 40 }}>
+                Когда мы делимся своей культурой с другими — это помогает и нам: остановиться, оглянуться, увидеть, как далеко мы продвинулись. Образовательный продукт — часть нашего собственного развития.
+              </p>
+            </Reveal>
+
+            {/* Quote */}
+            <Reveal delay={0.15}>
+              <blockquote style={{
+                borderLeft: '2px solid var(--accent)',
+                paddingLeft: 24, margin: 0,
+              }}>
+                <p style={{
+                  fontFamily: 'var(--serif)', fontStyle: 'italic',
+                  fontSize: 18, lineHeight: 1.6, color: 'var(--text)', marginBottom: 12,
+                }}>
+                  «Для нас выход на новый уровень всегда происходит через рефлексию своего опыта и через передачу его другим, кому это полезно.»
+                </p>
+                <cite style={{ fontSize: 13, color: 'var(--muted)', fontStyle: 'normal', fontWeight: 500 }}>
+                  Алексей Чистокин, директор Рэмос-Альфа
+                </cite>
+              </blockquote>
+            </Reveal>
+          </div>
+
+          <div>
+            <Reveal delay={0.1}>
+              <div style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr',
+                gap: 1, background: 'var(--border)', marginBottom: 40,
+              }}>
+                {stats.map((s, i) => (
+                  <div key={i} style={{
+                    background: 'var(--bg)', padding: '32px 28px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
+                      <span style={{ fontFamily: 'var(--serif)', fontSize: 36, fontWeight: 400, color: 'var(--text)' }}>{s.n}</span>
+                      {s.unit && <span style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 600 }}>{s.unit}</span>}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--muted)' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div style={{ padding: '28px 32px', background: 'var(--bg3)', borderRadius: 4 }}>
+                <p style={{ fontSize: 12, letterSpacing: '0.08em', color: 'var(--muted)', fontWeight: 600, marginBottom: 16 }}>
+                  ПОЧЕМУ МЫ СОЗДАЁМ ПРОГРАММЫ
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {[
+                    'Всё, что показываем — реально внедрено и работает каждый день',
+                    'Нет теорий без практики: каждый инструмент в контексте',
+                    'Участники видят результат, а не процесс обучения',
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                      <span style={{
+                        width: 20, height: 20, background: 'rgba(255,201,64,0.15)',
+                        color: 'var(--accent)', borderRadius: 3, flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, marginTop: 1,
+                      }}>{i + 1}</span>
+                      <span style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Contact ───────────────────────────────────────────── */
+function Contact() {
+  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ name: '', company: '', message: '' });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSent(true);
+  }
+
+  return (
+    <section id="contact" style={{
+      padding: '120px 40px',
+      borderTop: '1px solid var(--border)',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+
+          <div>
+            <Reveal>
+              <p style={{ fontSize: 11, letterSpacing: '0.12em', color: 'var(--accent)', fontWeight: 600, marginBottom: 16 }}>
+                КОНТАКТ
+              </p>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <h2 style={{
+                fontFamily: 'var(--serif)', fontWeight: 400,
+                fontSize: 'clamp(28px, 3.5vw, 48px)', lineHeight: 1.15,
+                marginBottom: 24,
+              }}>
+                Давайте обсудим вашу задачу
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.8, marginBottom: 48 }}>
+                Расскажите о вашей ситуации — мы разберёмся, есть ли смысл в совместной работе и в каком формате.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <ContactItem
+                  label="Анастасия Федорова"
+                  value="+7 905 256 37 14"
+                  href="tel:+79052563714"
+                />
+                <ContactItem
+                  label="Почта"
+                  value="fedorova@remos.ru"
+                  href="mailto:fedorova@remos.ru"
+                />
+                <ContactItem
+                  label="Telegram"
+                  value="@AnnVFed"
+                  href="https://t.me/AnnVFed"
+                />
+                <ContactItem
+                  label="Адрес"
+                  value="Кировск, Ленинградская область"
+                  href={null}
+                />
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.1}>
+            {!sent ? (
+              <form onSubmit={handleSubmit} style={{
+                display: 'flex', flexDirection: 'column', gap: 16,
+                padding: '40px', background: 'var(--bg2)',
+                border: '1px solid var(--border)', borderRadius: 4,
+              }}>
+                <FormField
+                  label="Имя и компания"
+                  placeholder="Иван Иванов, ООО Производство"
+                  value={form.name}
+                  onChange={v => setForm({ ...form, name: v })}
+                />
+                <FormField
+                  label="Ваш запрос"
+                  placeholder="Расскажите о задаче..."
+                  value={form.message}
+                  onChange={v => setForm({ ...form, message: v })}
+                  multiline
+                />
+                <button type="submit" style={{
+                  background: 'var(--accent)', color: 'var(--bg)',
+                  border: 'none', cursor: 'pointer',
+                  padding: '14px 24px', borderRadius: 4,
+                  fontSize: 14, fontWeight: 600, letterSpacing: '0.04em',
+                  transition: 'background 0.2s', fontFamily: 'var(--sans)',
+                }}
+                onMouseEnter={e => e.target.style.background = 'var(--accent2)'}
+                onMouseLeave={e => e.target.style.background = 'var(--accent)'}
+                >Отправить</button>
+                <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
+                  Или напишите напрямую в Telegram — @AnnVFed
+                </p>
+              </form>
+            ) : (
+              <div style={{
+                padding: '40px', background: 'var(--bg2)',
+                border: '1px solid rgba(255,201,64,0.25)', borderRadius: 4,
+                textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
+                <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 400, marginBottom: 12 }}>Получили!</h3>
+                <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.7 }}>
+                  Анастасия свяжется с вами в ближайшее время.
+                </p>
+              </div>
+            )}
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactItem({ label, value, href }) {
+  return (
+    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+      <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.08em', fontWeight: 600, marginBottom: 6 }}>{label.toUpperCase()}</div>
+      {href ? (
+        <a href={href} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 15, fontWeight: 400, transition: 'color 0.2s' }}
+          onMouseEnter={e => e.target.style.color = 'var(--accent)'}
+          onMouseLeave={e => e.target.style.color = 'var(--text)'}
+        >{value}</a>
+      ) : (
+        <span style={{ color: 'var(--text)', fontSize: 15 }}>{value}</span>
+      )}
+    </div>
+  );
+}
+
+function FormField({ label, placeholder, value, onChange, multiline }) {
+  const inputStyle = {
+    width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
+    borderRadius: 4, color: 'var(--text)', fontFamily: 'var(--sans)',
+    fontSize: 14, padding: '12px 14px', outline: 'none',
+    transition: 'border-color 0.2s', resize: 'vertical',
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <label style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.06em' }}>
+        {label.toUpperCase()}
+      </label>
+      {multiline
+        ? <textarea rows={4} placeholder={placeholder} value={value}
+            onChange={e => onChange(e.target.value)} style={inputStyle}
+            onFocus={e => e.target.style.borderColor = 'rgba(255,201,64,0.5)'}
+            onBlur={e => e.target.style.borderColor = 'var(--border)'}
+          />
+        : <input type="text" placeholder={placeholder} value={value}
+            onChange={e => onChange(e.target.value)} style={{ ...inputStyle, resize: 'none' }}
+            onFocus={e => e.target.style.borderColor = 'rgba(255,201,64,0.5)'}
+            onBlur={e => e.target.style.borderColor = 'var(--border)'}
+          />
+      }
+    </div>
+  );
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+function Footer() {
+  return (
+    <footer style={{
+      padding: '32px 40px',
+      borderTop: '1px solid var(--border)',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      background: 'var(--bg)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{
+          width: 22, height: 22, background: 'var(--accent)', borderRadius: 3,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'var(--serif)', fontSize: 11, color: 'var(--bg)',
+        }}>Р</span>
+        <span style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.06em' }}>ПРАКТИКИ РЭМОС</span>
+      </div>
+      <div style={{ fontSize: 12, color: 'var(--muted)' }}>© 2025 Рэмос-Альфа</div>
+    </footer>
+  );
+}
+
+/* ── App ─────────────────────────────────────────────────── */
+function App() {
+  return (
+    <>
+      <Nav />
+      <Hero />
+      <Approach />
+      <Programs />
+      <About />
+      <Contact />
+      <Footer />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
